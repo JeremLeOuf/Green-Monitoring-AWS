@@ -1,12 +1,14 @@
-from flask import Flask, request, jsonify
 import boto3
+import json
 import datetime
 import pandas as pd
 
-app = Flask(__name__)
+s3_client = boto3.client('s3')
+cloudwatch_client = boto3.client('cloudwatch')
 
-# Load the CSV file
-instance_data = pd.read_csv('https://raw.githubusercontent.com/cloud-carbon-footprint/cloud-carbon-coefficients/main/data/aws-instances.csv')
+# Load the CSV file from GitHub
+csv_url = 'https://raw.githubusercontent.com/cloud-carbon-footprint/cloud-carbon-coefficients/main/data/aws-instances.csv'
+instance_data = pd.read_csv(csv_url)
 
 def get_instance_power(instance_type, utilization):
     instance_row = instance_data[instance_data['InstanceType'] == instance_type].iloc[0]
@@ -14,30 +16,13 @@ def get_instance_power(instance_type, utilization):
     max_power = instance_row['PkgWatt @ 100%']
     return idle_power + (max_power - idle_power) * (utilization / 100.0)
 
-def get_memory_power():
-    pass
-    #TODO
+def lambda_handler(event, context):
+    body = json.loads(event['body'])
+    instance_type = body['instance_type']
+    region = body['region']
+    period = body.get('period', 86400)  #TODO: Should be an input from index.html
 
-def get_network_usage():
-    # not sure if possible...
-    pass
-
-@app.route('/calculate', methods=['POST'])
-def calculate():
-    data = request.json
-    instance_type = data['instance_type']
-    region = data['region']
-    period = data.get('period', 86400)  # Default to 24 hours 
-    # TODO: Change that to input of the webform
-    
-    '''
-
-    Need a conversion function here from user input to seconds
-    Also to add in the UI: a dropdown to choose the period (daily/weekly/yearly)
-
-    '''  
-
-    # Initialize AWS clients for the specified region
+    # Initialize AWS client for the specified region
     cloudwatch = boto3.client('cloudwatch', region_name=region)
     
     end_time = datetime.datetime.utcnow()
@@ -70,12 +55,22 @@ def calculate():
         results['InstanceType'] = instance_type
         results['Power'] = {
             'CPU': get_instance_power(instance_type, results['CPUUtilization']),
-            'Memory': results['MemoryUtilization']  #TODO: Add appropriate logic to calculate memory power usage if available
+            'Memory': results['MemoryUtilization']  # Add appropriate logic to calculate memory power usage if available; TODO
+            
+            # TODO: ADD NETWORKING?
+            
+            # TODO: ADD GPU?
+            
+            # TODO: ADD ElectricityMaps API to lookup for the region
         }
     except Exception as e:
         results['InstanceType'] = {'Error': str(e)}
 
-    return jsonify(results)
-
-if __name__ == '__main__':
-    app.run(debug=True)
+    return {
+        'statusCode': 200,
+        'body': json.dumps(results),
+        'headers': {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'  # Allow all origins for CORS
+        }
+    }
