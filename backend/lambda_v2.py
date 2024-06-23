@@ -16,13 +16,29 @@ def get_instance_power(instance_type, utilization):
     max_power = instance_row['PkgWatt @ 100%']
     return idle_power + (max_power - idle_power) * (utilization / 100.0)
 
+def get_memory_power(instance_type):
+    instance_row = instance_data[instance_data['InstanceType'] == instance_type].iloc[0]
+    mem_idle_power = instance_row['RAMWatt @ Idle']
+    mem_10_power = instance_row['RAMWatt @ 10%']
+    mem_50_power = instance_row['RAMWatt @ 50%']
+    mem_max_power = instance_row['RAMWatt @ 100%'] 
+
+def get_gpu_power():
+    pass #TODO
+
+# Useful? Let's see
+
+def get_network_usage():
+    # not sure if possible...
+    pass
+
 def lambda_handler(event, context):
     body = json.loads(event['body'])
     instance_type = body['instance_type']
     region = body['region']
-    period = body.get('period', 86400)  #TODO: Should be an input from index.html
+    period = int(body.get('period', 86400))  # Default to 24 hours if not provided
 
-    # Initialize AWS client for the specified region
+    # Initialize AWS clients for the specified region
     cloudwatch = boto3.client('cloudwatch', region_name=region)
     
     end_time = datetime.datetime.utcnow()
@@ -55,13 +71,7 @@ def lambda_handler(event, context):
         results['InstanceType'] = instance_type
         results['Power'] = {
             'CPU': get_instance_power(instance_type, results['CPUUtilization']),
-            'Memory': results['MemoryUtilization']  # Add appropriate logic to calculate memory power usage if available; TODO
-            
-            # TODO: ADD NETWORKING?
-            
-            # TODO: ADD GPU?
-            
-            # TODO: ADD ElectricityMaps API to lookup for the region
+            'Memory': results['MemoryUtilization']  # Add appropriate logic to calculate memory power usage if available
         }
     except Exception as e:
         results['InstanceType'] = {'Error': str(e)}
