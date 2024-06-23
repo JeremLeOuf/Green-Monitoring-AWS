@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function() {
               throw new Error(`HTTP error! Status: ${response.status}`);
           }
 
-          const data = await response.json();
+          let data = await response.json();
 
           // Parse the body from the response if it is a string
           if (typeof data.body === 'string') {
