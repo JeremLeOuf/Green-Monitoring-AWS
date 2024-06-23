@@ -9,10 +9,9 @@ apt update && apt -y upgrade
 # Install stress-ng and iperf
 apt -y install stress-ng iperf
 
-
 ##### LAMP INSTALLATION #####
 
-# PASSWORD IS "bGGik5cq4mmuTKti69"
+# PASSWORD IS "bGGik5cq4mmuTKti69^"
 
 
 # Install Apache web server
@@ -97,15 +96,12 @@ EOF
 echo "CloudWatch agent configured and started."
 
 # Create the stress test script
-cat <<'EOF' > /home/ubuntu/ec2_hardware_stress.sh
+cat <<'EOF' > /home/ubuntu/hardware_stress.sh
 #!/bin/bash
 
 while true; do
-    # Run CPU stress test for 10 minutes
+    # Run CPU stress test on 2 cores for 10 minutes
     stress-ng --cpu 2 --timeout 600s
-    
-    # Run memory stress test for 10 minutes
-    stress-ng --vm 1 --vm-bytes 512M --timeout 600s
     
     # Sleep for 5 minutes to let the instance recover
     sleep 300s
@@ -113,14 +109,14 @@ done
 EOF
 
 # Make the stress test script executable
-chmod +x /home/ubuntu/ec2_hardware_stress.sh
+chmod +x /home/ubuntu/hardware_stress.sh
 
 echo "Starting the network load script..."
 
 # Starts an iperf client in the background to my webserver server for 20mins
-nohup iperf -c  &
+nohup iperf -c 16.171.200.246 &
 
 echo "Starting the hardware load script..."
 
 # Run the stress test script in the background
-nohup /home/ubuntu/ec2_hardware_stress.sh &
+nohup /home/ubuntu/hardware_stress.sh &
