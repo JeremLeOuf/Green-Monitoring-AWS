@@ -7,29 +7,31 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>CloudWatch Metrics</h1>
-    <form id="metrics-form">
-        <label for="instance_type">Instance Type:</label>
-        <input type="text" id="instance_type" name="instance_type" required>
-        <br>
-        <label for="region">Region:</label>
-        <input type="text" id="region" name="region" required>
-        <br>
-        <label for="period">Period:</label>
-        <select id="period" name="period">
-            <option value="3600">1 Hour</option>
-            <option value="43200">12 Hours</option>
-            <option value="86400">1 Day</option>
-            <option value="604800">1 Week</option>
-            <option value="2592000">1 Month</option>
-        </select>
-        <br>
-        <label for="vcpu_utilization">Avg vCPU Utilization (%):</label>
-        <input type="number" id="vcpu_utilization" name="vcpu_utilization" value="10" min="0" max="100">
-        <br>
-        <button type="submit">Submit</button>
-    </form>
-    <div id="results"></div>
+    <div class="container">
+        <h1>CloudWatch Metrics Calculator</h1>
+        <form id="metrics-form">
+            <div class="form-group">
+                <label for="instance_type">Instance Type:</label>
+                <input type="text" id="instance_type" name="instance_type" required>
+            </div>
+            <div class="form-group">
+                <label for="period">Period:</label>
+                <select id="period" name="period">
+                    <option value="3600">1 Hour</option>
+                    <option value="43200">12 Hours</option>
+                    <option value="86400">1 Day</option>
+                    <option value="604800">1 Week</option>
+                    <option value="2592000">1 Month</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="vcpu_utilization">Avg vCPU Utilization (%):</label>
+                <input type="number" id="vcpu_utilization" name="vcpu_utilization" value="10" min="0" max="100">
+            </div>
+            <button type="submit">Submit</button>
+        </form>
+        <div id="results"></div>
+    </div>
 
     <script src="script.js"></script>
 </body>

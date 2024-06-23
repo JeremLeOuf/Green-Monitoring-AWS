@@ -7,17 +7,18 @@ import datetime
 instance_data = pd.read_csv(
     'https://raw.githubusercontent.com/cloud-carbon-footprint/cloud-carbon-coefficients/main/data/aws-instances.csv')
 
-
 def lambda_handler(event, context):
     print("Received event:", json.dumps(event))  # Log the event object
 
     try:
         # Extract instance_type, region, period, and vcpu_utilization from the event payload
         instance_type = event['instance_type']
+        
         # Default period to 86400 if not provided
-        period = event.get('period', 86400)
+        period = float(event.get('period', 86400))
+        
         # Default vCPU utilization to 10% if not provided
-        vcpu_utilization = event.get('vcpu_utilization', 10)
+        vcpu_utilization = float(event.get('vcpu_utilization', 10))
 
         # Fetch power consumption data for the given instance type
         instance_row = instance_data[instance_data['Instance type']
@@ -41,19 +42,16 @@ def lambda_handler(event, context):
 
         # Create the table data
         table_data = [
-            {'Metric': 'Average Min Watts', 'Value': f'{min_watts:.2f}'},
-            {'Metric': 'Average Max Watts', 'Value': f'{max_watts:.2f}'},
-            {'Metric': 'Average Watts', 'Value': f'{avg_watts:.2f}'},
-            {'Metric': 'Watt Hours', 'Value': f'{watt_hours:.2f}'},
+            {'Metric': 'Min. Watts:', 'Value': f'{min_watts:.2f} W'},
+            {'Metric': 'Max Watts:', 'Value': f'{max_watts:.2f} W'},
+            {'Metric': 'Average Watts:', 'Value': f'{avg_watts:.2f} W'},
+            {'Metric': f'Watt Hours used for running the instance for {hours_in_period:.0f} hours:', 'Value': f'{watt_hours:.2f} Wh'},
         ]
 
         # Create the messages array
         messages = [
-            f"Your {instance_type} instance",
-            f"had an average {vcpu_utilization}% CPU utilization over the last {
-                hours_in_period:.0f} hours.",
-            f"It generated an average of {avg_watts:.2f} watts, consuming a total of {
-                watt_hours:.2f} watt-hours."
+            f"Your `{instance_type}` instance had an average {vcpu_utilization}% CPU utilization over the last {hours_in_period:.0f} hours.",
+            f"It generated an average of {avg_watts:.2f} Watts (W), consuming a total of {watt_hours:.2f} Watt-Hours (Wh) over that period.",
         ]
 
         results = {
