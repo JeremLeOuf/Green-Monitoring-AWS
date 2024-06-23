@@ -45,13 +45,12 @@ def lambda_handler(event, context):
             {'Metric': 'Min. Watts:', 'Value': f'{min_watts:.2f} W'},
             {'Metric': 'Max Watts:', 'Value': f'{max_watts:.2f} W'},
             {'Metric': 'Average Watts:', 'Value': f'{avg_watts:.2f} W'},
-            {'Metric': f'Watt Hours used for running the instance for {hours_in_period:.0f} hours:', 'Value': f'{watt_hours:.2f} Wh'},
+            {'Metric': f'Watt-Hour used for running the instance during {hours_in_period:.0f} hours:', 'Value': f'{watt_hours:.2f} Wh'},
         ]
 
         # Create the messages array
         messages = [
-            f"Your `{instance_type}` instance had an average {vcpu_utilization}% CPU utilization over the last {hours_in_period:.0f} hours.",
-            f"It generated an average of {avg_watts:.2f} Watts (W), consuming a total of {watt_hours:.2f} Watt-Hours (Wh) over that period.",
+            f"Your `{instance_type}` instance with an average {vcpu_utilization}% CPU Utilization over a period of {hours_in_period:.0f} hour(s) would generate an average of {avg_watts:.2f} Watts (W), consuming a total of {watt_hours:.2f} Watt-Hours (Wh) over that period.",
         ]
 
         results = {
