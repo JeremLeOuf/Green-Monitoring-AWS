@@ -60,10 +60,10 @@ document.addEventListener('DOMContentLoaded', function() {
             message = message.replace(/(\d+) (hour\(s\))/g, '<b>$1</b> <b>$2</b>');
             
             // Bold numerical values followed by " Watts" for Watts
-            message = message.replace(/(\d+) ( Watts\(s\))/g, '<b>$1 Watts</b>');
+            message = message.replace(/(\d+\.\d+) ( Watts\(s\))/g, '<b>$1 Watts</b>');
             
             // Bold numerical values followed by " Watt-Hours" for Watt-Hours
-            message = message.replace(/(\d+) ( Watt-Hours\(s\))/g, '<b>$1 Watt-Hours</b>');
+            message = message.replace(/(\d+\.\d+) ( Watt-Hours\(s\))/g, '<b>$1 Watt-Hours</b>');
     
             // Replace inline code with <code> tags
             message = message.replace(/`(.*?)`/g, '<code>$1</code>');
