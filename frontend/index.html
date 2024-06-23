@@ -1,12 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CloudWatch Metrics</title>
 </head>
-
 <body>
     <h1>CloudWatch Metrics</h1>
     <form id="metrics-form">
@@ -16,11 +14,19 @@
         <label for="region">Region:</label>
         <input type="text" id="region" name="region" required>
         <br>
+        <label for="period">Period:</label>
+        <select id="period" name="period">
+            <option value="3600">1 Hour</option>
+            <option value="43200">12 Hours</option>
+            <option value="86400">1 Day</option>
+            <option value="604800">1 Week</option>
+            <option value="2592000">1 Month</option>
+        </select>
+        <br>
         <button type="submit">Submit</button>
     </form>
     <div id="results"></div>
 
     <script src="script.js"></script>
 </body>
-
 </html>
