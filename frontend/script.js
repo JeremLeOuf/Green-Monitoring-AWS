@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
         };
 
         try {
-            const response = await fetch('<your_lambda_endpoint>', {
+            const response = await fetch('https://8f72pd0xpd.execute-api.eu-north-1.amazonaws.com/test/calculate', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
