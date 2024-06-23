@@ -1,89 +1,61 @@
-from flask import Flask, request, jsonify
 import boto3
-import datetime
+import json
 import pandas as pd
+import datetime
 
-app = Flask(__name__)
-
-# Load the CSV file
+# Load the CSV file once
 instance_data = pd.read_csv('https://raw.githubusercontent.com/cloud-carbon-footprint/cloud-carbon-coefficients/main/data/aws-instances.csv')
 
-def get_instance_power(instance_type, utilization):
-    instance_row = instance_data[instance_data['InstanceType'] == instance_type].iloc[0]
-    idle_power = instance_row['PkgWatt @ Idle']
-    max_power = instance_row['PkgWatt @ 100%']
-    return idle_power + (max_power - idle_power) * (utilization / 100.0)
-
-def get_memory_power(instance_type):
-    instance_row = instance_data[instance_data['InstanceType'] == instance_type].iloc[0]
-    mem_idle_power = instance_row['RAMWatt @ Idle']
-    mem_10_power = instance_row['RAMWatt @ 10%']
-    mem_50_power = instance_row['RAMWatt @ 50%']
-    mem_max_power = instance_row['RAMWatt @ 100%'] 
-
-def get_gpu_power():
-    pass #TODO
-
-# Useful? Let's see
-
-def get_network_usage():
-    # not sure if possible...
-    pass
-
-@app.route('/calculate', methods=['POST'])
-def calculate():
-    data = request.json
-    instance_type = data['instance_type']
-    region = data['region']
-    period = data.get('period', 86400)  # Default to 24 hours 
-    # TODO: Change that to input of the webform
+def lambda_handler(event, context):
+    print("Received event:", json.dumps(event))  # Log the event object
     
-    '''
-
-    Need a conversion function here from user input to seconds
-    Also to add in the UI: a dropdown to choose the period (daily/weekly/yearly)
-
-    '''  
-
-    # Initialize AWS clients for the specified region
-    cloudwatch = boto3.client('cloudwatch', region_name=region)
-    
-    end_time = datetime.datetime.utcnow()
-    start_time = end_time - datetime.timedelta(seconds=period)
-
-    results = {}
-
-    for metric_name in ['CPUUtilization', 'MemoryUtilization']:
-        try:
-            response = cloudwatch.get_metric_statistics(
-                Namespace='AWS/EC2' if metric_name == 'CPUUtilization' else 'CWAgent',
-                MetricName=metric_name,
-                Dimensions=[{'Name': 'InstanceType', 'Value': instance_type}],
-                StartTime=start_time,
-                EndTime=end_time,
-                Period=period,
-                Statistics=['Average'],
-                Unit='Percent'
-            )
-            datapoints = response['Datapoints']
-            if datapoints:
-                average_utilization = sum(d['Average'] for d in datapoints) / len(datapoints)
-            else:
-                average_utilization = 0
-            results[metric_name] = average_utilization
-        except Exception as e:
-            results[metric_name] = {'Error': str(e)}
-
     try:
-        results['InstanceType'] = instance_type
-        results['Power'] = {
-            'CPU': get_instance_power(instance_type, results['CPUUtilization']),
-            'Memory': results['MemoryUtilization']  #TODO: Add appropriate logic to calculate memory power usage if available, else use 
+        # Extract instance_type, region, period, and vcpu_utilization from the event payload
+        instance_type = event['instance_type']
+        region = event['region']
+        period = event.get('period', 86400)  # Default period to 86400 if not provided
+        vcpu_utilization = event.get('vcpu_utilization', 10)  # Default vCPU utilization to 10% if not provided
+
+        # Fetch power consumption data for the given instance type
+        instance_row = instance_data[instance_data['Instance type'] == instance_type].iloc[0]
+        min_watts = instance_row['PkgWatt @ Idle']
+        max_watts = instance_row['PkgWatt @ 100%']
+
+        # Calculate the average watts
+        avg_watts = min_watts + (vcpu_utilization / 100.0) * (max_watts - min_watts)
+
+        # Calculate the number of hours in the period
+        hours_in_period = period / 3600.0
+
+        # Compute watt-hours
+        watt_hours = avg_watts * hours_in_period
+
+        # Format the results
+        results = {
+            'instance_type': instance_type,
+            'region': region,
+            'period': period,
+            'min_watts': min_watts,
+            'max_watts': max_watts,
+            'vcpu_utilization': vcpu_utilization,
+            'avg_watts': avg_watts,
+            'watt_hours': watt_hours,
+            'message': f"Your {instance_type} instance hosted in the '{region}' region with an average {vcpu_utilization}% utilization over {hours_in_period:.2f} hours generated an average of {avg_watts:.2f} watts, consuming a total of {watt_hours:.2f} watt-hours."
         }
+
+        return {
+            'statusCode': 200,
+            'body': json.dumps(results)
+        }
+
+    except KeyError as e:
+        return {
+            'statusCode': 400,
+            'body': json.dumps({'error': 'Missing required parameter: {}'.format(str(e))})
+        }
+    
     except Exception as e:
-        results['InstanceType'] = {'Error': str(e)}
-
-    return jsonify(results)
-
-if __name__ == '__main__':
-    app.run(debug=True)
+        return {
+            'statusCode': 500,
+            'body': json.dumps({'error': str(e)})
+        }
