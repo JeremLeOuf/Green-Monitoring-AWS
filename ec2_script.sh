@@ -94,6 +94,8 @@ EOF
 # Start the CloudWatch Agent with the configuration file
 /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/home/ubuntu/cw_agent.json -s
 
+echo "CloudWatch agent configured and started."
+
 # Create the stress test script
 cat <<'EOF' > /home/ubuntu/ec2_hardware_stress.sh
 #!/bin/bash
@@ -113,8 +115,12 @@ EOF
 # Make the stress test script executable
 chmod +x /home/ubuntu/ec2_hardware_stress.sh
 
+echo "Starting the network load script..."
+
 # Starts an iperf client in the background to my webserver server for 20mins
 nohup iperf -c  &
+
+echo "Starting the hardware load script..."
 
 # Run the stress test script in the background
 nohup /home/ubuntu/ec2_hardware_stress.sh &

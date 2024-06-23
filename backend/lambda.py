@@ -14,9 +14,17 @@ def get_instance_power(instance_type, utilization):
     max_power = instance_row['PkgWatt @ 100%']
     return idle_power + (max_power - idle_power) * (utilization / 100.0)
 
-def get_memory_power():
-    pass
-    #TODO
+def get_memory_power(instance_type):
+    instance_row = instance_data[instance_data['InstanceType'] == instance_type].iloc[0]
+    mem_idle_power = instance_row['RAMWatt @ Idle']
+    mem_10_power = instance_row['RAMWatt @ 10%']
+    mem_50_power = instance_row['RAMWatt @ 50%']
+    mem_max_power = instance_row['RAMWatt @ 100%'] 
+
+def get_gpu_power():
+    pass #TODO
+
+# Useful? Let's see
 
 def get_network_usage():
     # not sure if possible...
@@ -70,7 +78,7 @@ def calculate():
         results['InstanceType'] = instance_type
         results['Power'] = {
             'CPU': get_instance_power(instance_type, results['CPUUtilization']),
-            'Memory': results['MemoryUtilization']  #TODO: Add appropriate logic to calculate memory power usage if available
+            'Memory': results['MemoryUtilization']  #TODO: Add appropriate logic to calculate memory power usage if available, else use 
         }
     except Exception as e:
         results['InstanceType'] = {'Error': str(e)}
