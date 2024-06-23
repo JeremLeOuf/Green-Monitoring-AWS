@@ -5,7 +5,7 @@ document.getElementById('metrics-form').addEventListener('submit', async functio
     const region = document.getElementById('region').value;
     const period = document.getElementById('period').value;
 
-    const response = await fetch('https://YOUR_API_GATEWAY_URL/prod/calculate', {
+    const response = await fetch('https://8f72pd0xpd.execute-api.eu-north-1.amazonaws.com/test/calculate', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
