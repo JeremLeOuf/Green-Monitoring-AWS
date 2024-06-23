@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const data = await response.json();
 
       // Build the table HTML
-      let tableHtml = `<table>`;
+      let tableHtml = `<table class="table">`;
       tableHtml += `<tr><th>Metric</th><th>Value</th></tr>`;
 
       // Loop through table data and add rows
