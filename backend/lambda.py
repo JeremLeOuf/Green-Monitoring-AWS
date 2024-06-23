@@ -1,21 +1,27 @@
 import boto3
 import json
 import pandas as pd
+import datetime
 
 # Load the CSV file once
-instance_data = pd.read_csv('https://raw.githubusercontent.com/cloud-carbon-footprint/cloud-carbon-coefficients/main/data/aws-instances.csv')
+instance_data = pd.read_csv(
+    'https://raw.githubusercontent.com/cloud-carbon-footprint/cloud-carbon-coefficients/main/data/aws-instances.csv')
+
 
 def lambda_handler(event, context):
     print("Received event:", json.dumps(event))  # Log the event object
 
     try:
-        # Extract instance_type, period, and vcpu_utilization from the event payload
+        # Extract instance_type, region, period, and vcpu_utilization from the event payload
         instance_type = event['instance_type']
-        period = event.get('period', 86400)  # Default period to 86400 if not provided
-        vcpu_utilization = event.get('vcpu_utilization', 10)  # Default vCPU utilization to 10% if not provided
+        # Default period to 86400 if not provided
+        period = event.get('period', 86400)
+        # Default vCPU utilization to 10% if not provided
+        vcpu_utilization = event.get('vcpu_utilization', 10)
 
         # Fetch power consumption data for the given instance type
-        instance_row = instance_data[instance_data['Instance type'] == instance_type].iloc[0]
+        instance_row = instance_data[instance_data['Instance type']
+                                     == instance_type].iloc[0]
         min_watts = instance_row['PkgWatt @ Idle']
         max_watts = instance_row['PkgWatt @ 100%']
 
@@ -24,7 +30,8 @@ def lambda_handler(event, context):
         max_watts = float(max_watts.replace(",", "."))
 
         # Calculate the average watts
-        avg_watts = min_watts + (vcpu_utilization / 100.0) * (max_watts - min_watts)
+        avg_watts = min_watts + \
+            (vcpu_utilization / 100.0) * (max_watts - min_watts)
 
         # Calculate the number of hours in the period
         hours_in_period = period / 3600.0
@@ -32,7 +39,7 @@ def lambda_handler(event, context):
         # Compute watt-hours
         watt_hours = avg_watts * hours_in_period
 
-        # Create the table using string formatting
+        # Create the table data
         table_data = [
             {'Metric': 'Average Min Watts', 'Value': f'{min_watts:.2f}'},
             {'Metric': 'Average Max Watts', 'Value': f'{max_watts:.2f}'},
@@ -40,12 +47,17 @@ def lambda_handler(event, context):
             {'Metric': 'Watt Hours', 'Value': f'{watt_hours:.2f}'},
         ]
 
-        # Create the message string
-        message = f"Your {instance_type} instance with an average {vcpu_utilization}% utilization over {hours_in_period:.2f} hours generated an average of {avg_watts:.2f} watts, consuming a total of {watt_hours:.2f} watt-hours."
+        # Create the messages array
+        messages = [
+            f"Your {instance_type} instance",
+            f"had an average {vcpu_utilization}% CPU utilization over the last {
+                hours_in_period:.0f} hours.",
+            f"It generated an average of {avg_watts:.2f} watts, consuming a total of {
+                watt_hours:.2f} watt-hours."
+        ]
 
-        # Combine table and message after both are defined
         results = {
-            'message': message,
+            'messages': messages,
             'table_data': table_data,
         }
 
