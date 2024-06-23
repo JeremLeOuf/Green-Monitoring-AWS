@@ -8,13 +8,13 @@ document.addEventListener('DOMContentLoaded', function() {
         // Fetch form values
         const instanceType = document.getElementById('instance_type').value;
         const region = document.getElementById('region').value;
-        const period = document.getElementById('period').value;
+        const period = parseInt(document.getElementById('period').value); // Assuming 'period' is a number in seconds
 
         // Construct payload for Lambda function
         const payload = {
             instance_type: instanceType,
             region: region,
-            period: parseInt(period) // Ensure period is parsed as integer
+            period: period
         };
 
         try {
