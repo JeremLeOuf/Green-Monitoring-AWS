@@ -3,19 +3,30 @@ import json
 import pandas as pd
 import requests
 
+# Define region mapping for electricitymap.org API
+region_mapping = {
+    'eu-central-1': 'DE',
+    'eu-west-1': 'IE',
+    'eu-west-2': 'GB',
+    'eu-west-3': 'FR',
+    'eu-north-1': 'SE-SE3'
+}
+
 
 def get_carbon_intensity(region):
-    lambda_client = boto3.client('lambda')
-    response = lambda_client.invoke(
-        FunctionName='your-electricitymaps-lambda-function',
-        InvocationType='RequestResponse',
-        Payload=json.dumps({'region': region})
-    )
-    response_payload = json.loads(response['Payload'].read())
-    if response_payload['statusCode'] == 200:
-        return json.loads(response_payload['body'])['carbon_intensity']
-    else:
-        raise Exception(response_payload['body'])
+    api_url = f"https://api.electricitymap.org/v3/carbon-intensity/latest?zone={
+        region_mapping.get(region)}"
+    headers = {
+        'auth-token': 'mH1ux820u6aJMbHz3svz1AD3'
+    }
+
+    try:
+        response = requests.get(api_url, headers=headers)
+        response.raise_for_status()
+        data = response.json()
+        return data['carbonIntensity']
+    except requests.RequestException as e:
+        raise Exception(f"Error fetching carbon intensity: {str(e)}")
 
 
 def lambda_handler(event, context):
@@ -95,17 +106,17 @@ def lambda_handler(event, context):
 
         # Combine results into a dictionary
         results = {
-            'messages': messages,
-            'table_data': {
-                'min_max': min_max_data,
-                'avg_watt_hours': avg_watt_hours_data
-            }
+            'statusCode': 200,
+            'body': json.dumps({
+                'messages': messages,
+                'table_data': {
+                    'min_max': min_max_data,
+                    'avg_watt_hours': avg_watt_hours_data
+                }
+            })
         }
 
-        return {
-            'statusCode': 200,
-            'body': json.dumps(results)
-        }
+        return results
 
     except Exception as e:
         print(f"Error processing request: {e}")

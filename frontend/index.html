@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CloudWatch Metrics Calculator</title>
+    <title>CloudWatch Metrics</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -31,19 +31,15 @@
             </div>
             <div class="form-group">
                 <label for="region">Region:</label>
-                <select id="region" name="region">
-                    <option value="eu-central-1">EU (Frankfurt)</option>
-                    <option value="eu-west-1">EU (Ireland)</option>
-                    <option value="eu-west-2">EU (London)</option>
-                    <option value="eu-west-3">EU (Paris)</option>
-                    <option value="eu-north-1">EU (Stockholm)</option>
-                </select>
+                <input type="text" id="region" name="region" required>
             </div>
             <button type="submit">Submit</button>
         </form>
         <div id="results"></div>
     </div>
 
+    <!-- Include AWS SDK v2 -->
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1043.0.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

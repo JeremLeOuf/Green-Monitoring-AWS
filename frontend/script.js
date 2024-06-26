@@ -20,88 +20,72 @@ document.addEventListener('DOMContentLoaded', function() {
         };
 
         try {
-            const response = await fetch('https://8f72pd0xpd.execute-api.eu-north-1.amazonaws.com/test/calculate', {
+            const response = await fetch('https://gqupth3jnl.execute-api.eu-north-1.amazonaws.com/test', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(payload)
+                body: JSON.stringify(payload),
             });
 
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
 
-            let data = await response.json();
+            const data = await response.json();
+            console.log('Lambda function executed successfully:', data);
 
-            // Parse the body from the response if it is a string
-            if (typeof data.body === 'string') {
-                data = JSON.parse(data.body);
-            }
-
-            // Ensure data.messages and data.table_data are defined
-            if (!data.messages || !data.table_data) {
-                throw new Error("Messages or table_data is undefined");
-            }
-
-            // Format and display results
+            // Display results in the resultsDiv
             resultsDiv.innerHTML = formatResults(data);
+
         } catch (error) {
-            console.error('Error invoking Lambda:', error);
+            console.error('Error calling Lambda function:', error);
             resultsDiv.innerHTML = `<div>Error: ${error.message}</div>`;
         }
     });
 
     function formatResults(data) {
-        // Combine all messages into a single string with line breaks and formatting
-        let formattedMessages = data.messages.map(message => {
-            // Bold specific value for Kilowatt-Hours (kWh)
-            message = message.replace(/(\d+\.\d+) Kilowatt-Hours:/g, '<b>$1 Kilowatt-Hours:</b>');
-
-            // Bold numerical values followed by % for CPU utilization, including "CPU Utilization"
-            message = message.replace(/(\d+(\.\d+)?)% (CPU Utilization)/g, '<b>$1%</b> <b>$3</b>');
+        console.log('Response data:', data); // Log the response for debugging
     
-            // Bold numbers followed by "hour(s)"
-            message = message.replace(/(\d+) (hour\(s\))/g, '<b>$1</b> <b>$2</b>');
+        // Check if data object is defined and contains messages and table_data
+        if (data && data.body) {
+            const parsedData = JSON.parse(data.body);
     
-            // Bold numerical values followed by " Watts" for Watts
-            message = message.replace(/(\d+\.\d+) (Watts)/g, '<b>$1</b> <b>$2</b>');
+            // Check if parsedData contains messages and table_data
+            if (parsedData.messages && parsedData.table_data) {
+                // Construct formatted messages
+                let formattedMessages = parsedData.messages.map(message => {
+                    // Add formatting as needed
+                    return message;
+                }).join('<br>');
     
-            // Bold numerical values followed by " Watt-Hours" for Watt-Hours
-            message = message.replace(/(\d+\.\d+) (Kilowatt-Hours)/g, '<b>$1</b> <b>$2</b>');
+                // Build the first table for min_max data
+                let minMaxTableHtml = `<table class="table instance-table">`;
+                minMaxTableHtml += `<tr><th>Instance details:</th><th>Value:</th></tr>`;
+                for (const row of parsedData.table_data.min_max) {
+                    minMaxTableHtml += `<tr><td>${row.Metric}</td><td>${row.Value}</td></tr>`;
+                }
+                minMaxTableHtml += `</table>`;
     
-            // Replace inline code with <code> tags
-            message = message.replace(/`(.*?)`/g, '<code>$1</code>');
+                // Build the second table for avg_watt_hours data
+                let avgWattHoursTableHtml = `<table class="table utilization-table">`;
+                avgWattHoursTableHtml += `<tr><th>Utilization details:</th><th>Value:</th></tr>`;
+                for (const row of parsedData.table_data.avg_watt_hours) {
+                    avgWattHoursTableHtml += `<tr><td>${row.Metric}</td><td>${row.Value}</td></tr>`;
+                }
+                avgWattHoursTableHtml += `</table>`;
     
-            return message;
-        }).join('<br>');
-    
-        // Build the first table for min_max data
-        let minMaxTableHtml = `<table class="table instance-table">`;
-        minMaxTableHtml += `<tr><th>Instance details:</th><th>Value:</th></tr>`;
-        for (const row of data.table_data.min_max) {
-            minMaxTableHtml += `<tr><td>${row.Metric}</td><td>${row.Value}</td></tr>`;
-        }
-        minMaxTableHtml += `</table>`;
-    
-        // Build the second table for avg_watt_hours data
-        let avgWattHoursTableHtml = `<table class="table utilization-table">`;
-        avgWattHoursTableHtml += `<tr><th>Utilization details:</th><th>Value:</th></tr>`;
-        for (const row of data.table_data.avg_watt_hours) {
-            // Bold the specific value for Kilowatt-Hours (kWh) in the table
-            if (row.Metric.includes('Instance power consumption (kWh)')) {
-                avgWattHoursTableHtml += `<tr><td>${row.Metric}</td><td><b>${row.Value}</b></td></tr>`;
+                // Return the combined HTML for messages and both tables
+                return `
+                    <p>${formattedMessages}</p>
+                    ${minMaxTableHtml}
+                    ${avgWattHoursTableHtml}
+                `;
             } else {
-                avgWattHoursTableHtml += `<tr><td>${row.Metric}</td><td>${row.Value}</td></tr>`;
+                return '<p>No data available.</p>';
             }
+        } else {
+            return '<p>No data available.</p>';
         }
-        avgWattHoursTableHtml += `</table>`;
-    
-        // Return the combined HTML for messages and both tables
-        return `
-            <p>${formattedMessages}</p>
-            ${minMaxTableHtml}
-            ${avgWattHoursTableHtml}
-        `;
-    }    
+    }
 });
