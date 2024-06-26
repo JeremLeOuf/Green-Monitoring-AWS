@@ -54,7 +54,6 @@ def lambda_handler(event, context):
             min_watts = float(instance_row['PkgWatt @ Idle'].replace(",", "."))
             max_watts = float(instance_row['PkgWatt @ 100%'].replace(",", "."))
         except (KeyError, IndexError) as e:
-            # Handle cases where instance type is not found or data is missing
             raise Exception(f"Instance type '{
                             instance_type}' not found or data missing in CSV") from e
 
@@ -95,14 +94,12 @@ def lambda_handler(event, context):
             {'Metric': f'Instance power consumption (kWh) for {period_label}:', 'Value': f'{
                 kWh:.2f} kWh'},
             {'Metric': f'Carbon Intensity (gCO2/kWh):',
-             'Value': f'{carbon_intensity:.2f} gCO2/kWh'}
+             'Value': f'{carbon_intensity:.0f} gCO2e/kWh'}
         ]
 
         # Create the messages for the response
         messages = [
-            f"Your `{instance_type}` instance with an average {vcpu_utilization:.0f}% CPU Utilization over a period of {period_label} would generate an average of {
-                avg_watts:.2f} Watts (W), consuming a total of {kWh:.2f} Kilowatt-Hours (kWh) over that period. The carbon intensity for your region is {carbon_intensity:.2f} gCO2/kWh."
-        ]
+            f"Your `{instance_type}` instance with an average {vcpu_utilization:.0f}% CPU Utilization over a period of {period_label} would generate an average of {avg_watts:.2f} Watts (W), consuming a total of <b>{kWh:.2f} Kilowatt-Hours (kWh)</b> over that period. The carbon intensity for your region is {carbon_intensity:.2f} gCO2/kWh."]
 
         # Combine results into a dictionary
         results = {

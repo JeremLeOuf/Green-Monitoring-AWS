@@ -31,8 +31,14 @@
             </div>
             <div class="form-group">
                 <label for="region">Region:</label>
-                <input type="text" id="region" name="region" required>
-            </div>
+                <select id="region">
+                  <option value="eu-central-1">EU (Frankfurt)</option>
+                  <option value="eu-west-1">EU (Ireland)</option>
+                  <option value="eu-west-2">EU (London)</option>
+                  <option value="eu-west-3">EU (Paris)</option>
+                  <option value="eu-north-1">EU (Stockholm)</option>
+                </select>
+              </div>
             <button type="submit">Submit</button>
         </form>
         <div id="results"></div>

@@ -81,14 +81,20 @@ button:hover {
 
 .instance-table, .utilization-table {
   table-layout: fixed;
+  width: 100%; /* Ensure tables take full width */
 }
 
-.instance-table th:nth-child(1), .utilization-table th:nth-child(1),
+.instance-table td, .utilization-table td {
+  word-break: break-word; /* Allow long words to break */
+}
+
 .instance-table td:nth-child(1), .utilization-table td:nth-child(1) {
-  width: 80%;  /* Adjusted to ensure long text fits */
+  width: 80%; /* Adjusted to ensure long text fits */
 }
 
-.instance-table th:nth-child(2), .utilization-table th:nth-child(2),
 .instance-table td:nth-child(2), .utilization-table td:nth-child(2) {
-  width: 20%;  /* Adjusted proportionally */
+  white-space: nowrap; /* Prevent text from wrapping */
+  overflow: hidden; /* Hide overflow content */
+  text-overflow: ellipsis; /* Display ellipsis for overflow text */
 }
+
