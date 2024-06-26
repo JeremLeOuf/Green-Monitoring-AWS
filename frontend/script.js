@@ -55,7 +55,18 @@ document.addEventListener('DOMContentLoaded', function() {
             if (parsedData.messages && parsedData.table_data) {
                 // Construct formatted messages
                 let formattedMessages = parsedData.messages.map(message => {
-                    // Add formatting as needed
+                    // Bold specific value for Kilowatt-Hours (kWh)
+                    message = message.replace(/(\d+\.\d+) Kilowatt-Hours:/g, '<b>$1 Kilowatt-Hours:</b>');
+    
+                    // Bold numerical values followed by % for CPU utilization, including "CPU Utilization"
+                    message = message.replace(/(\d+(\.\d+)?)% (CPU Utilization)/g, '<b>$1%</b> <b>$3</b>');
+    
+                    // Bold numbers followed by " Watt" for Watts
+                    message = message.replace(/(\d+\.\d+) Watts/g, '<b>$1 Watts</b>');
+    
+                    // Bold numbers followed by " gCO2/kWh" for Carbon Intensity
+                    message = message.replace(/(\d+\.\d+) gCO2\/kWh/g, '<b>$1 gCO2/kWh</b>');
+    
                     return message;
                 }).join('<br>');
     
@@ -71,7 +82,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 let avgWattHoursTableHtml = `<table class="table utilization-table">`;
                 avgWattHoursTableHtml += `<tr><th>Utilization details:</th><th>Value:</th></tr>`;
                 for (const row of parsedData.table_data.avg_watt_hours) {
-                    avgWattHoursTableHtml += `<tr><td>${row.Metric}</td><td>${row.Value}</td></tr>`;
+                    // Bold the specific value for Kilowatt-Hours (kWh) in the table
+                    if (row.Metric.includes('Instance power consumption (kWh)')) {
+                        avgWattHoursTableHtml += `<tr><td>${row.Metric}</td><td><b>${row.Value}</b></td></tr>`;
+                    } else {
+                        avgWattHoursTableHtml += `<tr><td>${row.Metric}</td><td>${row.Value}</td></tr>`;
+                    }
                 }
                 avgWattHoursTableHtml += `</table>`;
     
@@ -88,4 +104,5 @@ document.addEventListener('DOMContentLoaded', function() {
             return '<p>No data available.</p>';
         }
     }
+    
 });
