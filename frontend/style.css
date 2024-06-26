@@ -38,10 +38,9 @@ label {
 input[type="text"],
 input[type="number"],
 select {
-  width: calc(100% - 20px);
+  width: 100%;
   padding: 8px 10px;
   margin: 5px 0;
-  display: inline-block;
   border: 1px solid #ccc;
   border-radius: 4px;
   box-sizing: border-box;
@@ -72,13 +71,24 @@ button:hover {
 
 .table, .table th, .table td {
   border: 1px solid #ddd;
-}
-
-.table th, .table td {
   padding: 12px;
   text-align: left;
 }
 
 .table th {
   background-color: #f2f2f2;
+}
+
+.instance-table, .utilization-table {
+  table-layout: fixed;
+}
+
+.instance-table th:nth-child(1), .utilization-table th:nth-child(1),
+.instance-table td:nth-child(1), .utilization-table td:nth-child(1) {
+  width: 80%;  /* Adjusted to ensure long text fits */
+}
+
+.instance-table th:nth-child(2), .utilization-table th:nth-child(2),
+.instance-table td:nth-child(2), .utilization-table td:nth-child(2) {
+  width: 20%;  /* Adjusted proportionally */
 }

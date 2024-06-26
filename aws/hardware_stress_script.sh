@@ -74,14 +74,15 @@ echo "LAMP stack, stress-ng, iperf, and WordPress successfully installed!"
 cat <<'EOF' > /home/ubuntu/hardware_stress.sh
 #!/bin/bash
 
-while true; do
-    # Run CPU stress test on 2 cores for 10 minutes
-    stress-ng --cpu 2 --timeout 600s
-    
-    # Sleep for 5 minutes to let the instance recover
-    sleep 300s
+# Run CPU stress test on 2 cores for 10 minutes
+stress-ng --cpu 2 --timeout 600s
+
+
 done
 EOF
+
+
+## TODO: Make this script run for 10mins and multiply by 6, not indefinetely
 
 # Make the stress test script executable
 chmod +x /home/ubuntu/hardware_stress.sh
