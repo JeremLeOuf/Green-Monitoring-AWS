@@ -41,7 +41,7 @@ def lambda_handler(event, context):
             'Metric': 'Average Watts:',
             'Value': f'{avg_watts:.2f} W'
         }, {
-            'Metric': f'Watt-Hour used for running the instance during {hours_in_period:.0f} hours:',
+            'Metric': f'Instance power consumption (Wh) for {hours_in_period:.0f} hour(s):',
             'Value': f'{watt_hours:.2f} Wh'
         }
 

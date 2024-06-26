@@ -60,34 +60,48 @@ document.addEventListener('DOMContentLoaded', function() {
             message = message.replace(/(\d+) (hour\(s\))/g, '<b>$1</b> <b>$2</b>');
             
             // Bold numerical values followed by " Watts" for Watts
-            message = message.replace(/(\d+\.\d+) ( Watts\(s\))/g, '<b>$1 Watts</b>');
+            message = message.replace(/(\d+\.\d+) Watts/g, '<b>$1</b> Watts');
             
             // Bold numerical values followed by " Watt-Hours" for Watt-Hours
-            message = message.replace(/(\d+\.\d+) ( Watt-Hours\(s\))/g, '<b>$1 Watt-Hours</b>');
+            message = message.replace(/(\d+\.\d+) Watt-Hours/g, '<b>$1</b> Watt-Hours');
     
             // Replace inline code with <code> tags
             message = message.replace(/`(.*?)`/g, '<code>$1</code>');
     
             return message;
         }).join('<br>');
-    
-        // Build the table HTML
-        let tableHtml = `<table class="table">`;
-        tableHtml += `<tr><th>Instance details:</th><th>Value:</th></tr>`;
-    
-        // Loop through table data and add rows
+
+        // Build the "Instance details" table
+        let instanceTableHtml = `<table class="table">`;
+        instanceTableHtml += `<tr><th>Instance details:</th><th>Value:</th></tr>`;
+
+        // Filter data for instance details and add rows
         for (const row of data.table_data) {
-            tableHtml += `<tr><td>${row.Metric}</td><td>${row.Value}</td></tr>`;
+            if (row.Metric.includes('Watts')) {
+                instanceTableHtml += `<tr><td>${row.Metric}</td><td>${row.Value}</td></tr>`;
+            }
         }
-    
-        tableHtml += `</table>`;
-    
-        // Return the combined HTML for messages and table
+
+        instanceTableHtml += `</table>`;
+
+        // Build the "Utilization details" table
+        let utilizationTableHtml = `<table class="table">`;
+        utilizationTableHtml += `<tr><th>Utilization details:</th><th>Value:</th></tr>`;
+
+        // Filter data for utilization details and add rows
+        for (const row of data.table_data) {
+            if (!row.Metric.includes('Watts')) {
+                utilizationTableHtml += `<tr><td>${row.Metric}</td><td>${row.Value}</td></tr>`;
+            }
+        }
+
+        utilizationTableHtml += `</table>`;
+
+        // Return the combined HTML for messages and both tables
         return `
             <p>${formattedMessages}</p>
-            ${tableHtml}
+            ${instanceTableHtml}
+            ${utilizationTableHtml}
         `;
     }
-    
-    
 });
