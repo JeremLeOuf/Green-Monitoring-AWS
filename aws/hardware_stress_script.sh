@@ -11,7 +11,7 @@ apt -y install stress-ng iperf
 
 ######## LAMP INSTALLATION ########
 
-# PASSWORD IS "bGGik5cq4mmuTKti69^"
+# PASSWORD IS " bGGik5cq4mmuTKti69^ "
 
 ###################################
 
@@ -47,7 +47,6 @@ tar -xzf latest.tar.gz
 # Move WordPress files to document root
 mv wordpress/* /var/www/html/
 
-
 # Download WordPress security keys
 KEYS=$(curl -s https://api.wordpress.org/secret-key/1.1/salt/)
 
@@ -74,15 +73,11 @@ echo "LAMP stack, stress-ng, iperf, and WordPress successfully installed!"
 cat <<'EOF' > /home/ubuntu/hardware_stress.sh
 #!/bin/bash
 
-# Run CPU stress test on 2 cores for 10 minutes
-stress-ng --cpu 2 --timeout 600s
-
+# Run CPU stress test on 2 cores for 1 hour
+stress-ng --cpu 2 --timeout 3600s
 
 done
 EOF
-
-
-## TODO: Make this script run for 10mins and multiply by 6, not indefinetely
 
 # Make the stress test script executable
 chmod +x /home/ubuntu/hardware_stress.sh

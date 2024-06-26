@@ -9,12 +9,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const instanceType = document.getElementById('instance_type').value;
         const period = document.getElementById('period').value;
         const vcpuUtilization = document.getElementById('vcpu_utilization').value;
+        const region = document.getElementById('region').value;
 
         // Construct payload for Lambda function
         const payload = {
             instance_type: instanceType,
             period: parseInt(period),
-            vcpu_utilization: parseFloat(vcpuUtilization)
+            vcpu_utilization: parseFloat(vcpuUtilization),
+            region: region
         };
 
         try {

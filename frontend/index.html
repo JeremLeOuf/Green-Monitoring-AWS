@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CloudWatch Metrics</title>
+    <title>CloudWatch Metrics Calculator</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -28,6 +28,16 @@
             <div class="form-group">
                 <label for="vcpu_utilization">Average CPU Utilization (%):</label>
                 <input type="number" id="vcpu_utilization" name="vcpu_utilization" value="10" min="0" max="100">
+            </div>
+            <div class="form-group">
+                <label for="region">Region:</label>
+                <select id="region" name="region">
+                    <option value="eu-central-1">EU (Frankfurt)</option>
+                    <option value="eu-west-1">EU (Ireland)</option>
+                    <option value="eu-west-2">EU (London)</option>
+                    <option value="eu-west-3">EU (Paris)</option>
+                    <option value="eu-north-1">EU (Stockholm)</option>
+                </select>
             </div>
             <button type="submit">Submit</button>
         </form>
