@@ -5,11 +5,26 @@ import requests
 
 # Define region mapping for electricitymap.org API
 region_mapping = {
+    'us-east-1': 'US-MIDA-PJM',
+    'us-east-2': 'US-MIDA-PJM',
+    'us-west-1': 'US-CAL-CISO',
+    'us-west-2': 'US-NW-PACW',
+    'ap-south-1': 'IN-WE',
+    'ap-southeast-1': 'SG',
+    'ap-southeast-2': 'AU-NSW',
+    'ap-southeast-3': 'JP-KN',
+    'ap-southeast-4': 'PH',
+    'ap-northeast-1': 'JP-TK',
+    'ap-northeast-2': 'KR',
+    'ap-northeast-3': 'JP',
+    'ca-central-1': 'CA-AB',
     'eu-central-1': 'DE',
+    'eu-north-1': 'SE-SE3',
+    'eu-south-2': 'ES',
     'eu-west-1': 'IE',
     'eu-west-2': 'GB',
     'eu-west-3': 'FR',
-    'eu-north-1': 'SE-SE3'
+    'sa-east-1': 'BR-CS',
 }
 
 

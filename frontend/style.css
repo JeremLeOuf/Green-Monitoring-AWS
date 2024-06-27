@@ -85,16 +85,16 @@ button:hover {
 }
 
 .instance-table td, .utilization-table td {
-  word-break: break-word; /* Allow long words to break */
+  word-break: normal; /* Prevent word break */
 }
 
 .instance-table td:nth-child(1), .utilization-table td:nth-child(1) {
-  width: 80%; /* Adjusted to ensure long text fits */
+  width: 70%; /* Adjusted to ensure long text fits */
 }
 
 .instance-table td:nth-child(2), .utilization-table td:nth-child(2) {
+  width: 30%; /* Adjusted proportionally */
   white-space: nowrap; /* Prevent text from wrapping */
   overflow: hidden; /* Hide overflow content */
   text-overflow: ellipsis; /* Display ellipsis for overflow text */
 }
-

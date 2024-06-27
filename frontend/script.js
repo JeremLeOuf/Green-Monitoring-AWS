@@ -55,6 +55,9 @@ document.addEventListener('DOMContentLoaded', function() {
             if (parsedData.messages && parsedData.table_data) {
                 // Construct formatted messages
                 let formattedMessages = parsedData.messages.map(message => {
+                    // Add a line break before "The carbon intensity..."
+                    message = message.replace("The carbon intensity for your region is", "<br>The carbon intensity for your region is");
+    
                     // Bold specific value for Kilowatt-Hours (kWh)
                     message = message.replace(/(\d+\.\d+) Kilowatt-Hours:/g, '<b>$1 Kilowatt-Hours:</b>');
     
@@ -104,5 +107,4 @@ document.addEventListener('DOMContentLoaded', function() {
             return '<p>No data available.</p>';
         }
     }
-    
 });
