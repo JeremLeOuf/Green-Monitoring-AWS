@@ -105,16 +105,20 @@ def lambda_handler(event, context):
             {'Metric': 'Max Watts:', 'Value': f'{max_watts:.2f} W'}
         ]
         avg_watt_hours_data = [
-            {'Metric': 'Average Watts:', 'Value': f'{avg_watts:.2f} W'},
-            {'Metric': f'Instance power consumption (kWh) for {period_label}:', 'Value': f'{
-                kWh:.2f} kWh'},
-            {'Metric': f'Carbon Intensity (gCO2/kWh):',
-             'Value': f'{carbon_intensity:.0f} gCO2e/kWh'}
+            {'Metric': 'Average power consumption:', 'Value': f'{avg_watts:.2f} W'},
+            {'Metric': f'Power consumption on {
+                period_label}:', 'Value': f'{kWh:.2f} kWh'}
+        ]
+        carbon_intensity_data = [
+            {'Metric': 'Carbon Intensity:', 'Value': f'{
+                carbon_intensity:.0f} gCO2e/kWh'}
         ]
 
         # Create the messages for the response
         messages = [
-            f"Your `{instance_type}` instance with an average {vcpu_utilization:.0f}% CPU Utilization over a period of {period_label} would generate an average of {avg_watts:.2f} Watts (W), consuming a total of <b>{kWh:.2f} Kilowatt-Hours (kWh)</b> over that period. The carbon intensity for your region is {carbon_intensity:.2f} gCO2/kWh."]
+            f"Your {instance_type} instance with an average {vcpu_utilization:.0f}% CPU Utilization over a period of {period_label} would generate an average of {
+                avg_watts:.2f} Watts (W), consuming a total of <b>{kWh:.2f} Kilowatt-Hours (kWh)</b> over that period.<br><br>The carbon intensity for your region is {carbon_intensity:.2f} gCO2/kWh (as of **TODO**)."
+        ]
 
         # Combine results into a dictionary
         results = {
@@ -123,7 +127,8 @@ def lambda_handler(event, context):
                 'messages': messages,
                 'table_data': {
                     'min_max': min_max_data,
-                    'avg_watt_hours': avg_watt_hours_data
+                    'avg_watt_hours': avg_watt_hours_data,
+                    'carbon_intensity': carbon_intensity_data
                 }
             })
         }

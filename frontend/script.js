@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Lambda function executed successfully:', data);
 
             // Display results in the resultsDiv
-            resultsDiv.innerHTML = formatResults(data);
+            resultsDiv.innerHTML = formatResults(data, instanceType, period, region);
 
         } catch (error) {
             console.error('Error calling Lambda function:', error);
@@ -44,44 +44,50 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    function formatResults(data) {
+    function formatResults(data, instanceType, period, region) {
         console.log('Response data:', data); // Log the response for debugging
-    
+
         // Check if data object is defined and contains messages and table_data
         if (data && data.body) {
             const parsedData = JSON.parse(data.body);
-    
+
             // Check if parsedData contains messages and table_data
             if (parsedData.messages && parsedData.table_data) {
                 // Construct formatted messages
                 let formattedMessages = parsedData.messages.map(message => {
-                    // Add a line break before "The carbon intensity..."
-                    message = message.replace("The carbon intensity for your region is", "<br>The carbon intensity for your region is");
-    
+                    // Format instance type as markdown
+                    message = message.replace(instanceType, `\`${instanceType}\``);
+
                     // Bold specific value for Kilowatt-Hours (kWh)
                     message = message.replace(/(\d+\.\d+) Kilowatt-Hours:/g, '<b>$1 Kilowatt-Hours:</b>');
-    
+
                     // Bold numerical values followed by % for CPU utilization, including "CPU Utilization"
                     message = message.replace(/(\d+(\.\d+)?)% (CPU Utilization)/g, '<b>$1%</b> <b>$3</b>');
-    
+
                     // Bold numbers followed by " Watt" for Watts
                     message = message.replace(/(\d+\.\d+) Watts/g, '<b>$1 Watts</b>');
-    
-                    // Bold numbers followed by " gCO2/kWh" for Carbon Intensity
-                    message = message.replace(/(\d+\.\d+) gCO2\/kWh/g, '<b>$1 gCO2/kWh</b>');
-    
+
+                    // Bold numbers followed by " gCO2/kWh" for Carbon Intensity and round the number
+                    message = message.replace(/(\d+\.\d+) gCO2\/kWh/g, (_, value) => `<b>${Math.round(value)} gCO2/kWh</b>`);
+
+                    // Extract the number of hours from the message dynamically
+                    message = message.replace(/(\d+) hours/g, '<b>$1 hours</b>');
+
+                    // Include the region name with bold formatting
+                    message = message.replace(/The carbon intensity for your region is/, `The carbon intensity for your region <b>(${region})</b> is`);
+
                     return message;
                 }).join('<br>');
-    
-                // Build the first table for min_max data
+
+                // Build the first table for instance details data
                 let minMaxTableHtml = `<table class="table instance-table">`;
-                minMaxTableHtml += `<tr><th>Instance details:</th><th>Value:</th></tr>`;
+                minMaxTableHtml += `<tr><th>\`${instanceType}\` details:</th><th>Value:</th></tr>`;
                 for (const row of parsedData.table_data.min_max) {
                     minMaxTableHtml += `<tr><td>${row.Metric}</td><td>${row.Value}</td></tr>`;
                 }
                 minMaxTableHtml += `</table>`;
-    
-                // Build the second table for avg_watt_hours data
+
+                // Build the second table for the utilization data
                 let avgWattHoursTableHtml = `<table class="table utilization-table">`;
                 avgWattHoursTableHtml += `<tr><th>Utilization details:</th><th>Value:</th></tr>`;
                 for (const row of parsedData.table_data.avg_watt_hours) {
@@ -93,12 +99,21 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
                 avgWattHoursTableHtml += `</table>`;
-    
-                // Return the combined HTML for messages and both tables
+
+                // Build the third table for the carbon intensity data
+                let carbonIntensityTableHtml = `<table class="table carbon-intensity-table">`;
+                carbonIntensityTableHtml += `<tr><th>Region details:</th><th>Value:</th></tr>`;
+                for (const row of parsedData.table_data.carbon_intensity) {
+                    carbonIntensityTableHtml += `<tr><td>${row.Metric}</td><td>${row.Value}</td></tr>`;
+                }
+                carbonIntensityTableHtml += `</table>`;
+
+                // Return the combined HTML for messages and all tables
                 return `
                     <p>${formattedMessages}</p>
                     ${minMaxTableHtml}
                     ${avgWattHoursTableHtml}
+                    ${carbonIntensityTableHtml}
                 `;
             } else {
                 return '<p>No data available.</p>';

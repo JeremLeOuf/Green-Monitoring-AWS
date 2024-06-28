@@ -46,6 +46,20 @@ select {
   box-sizing: border-box;
 }
 
+.inline-group {
+  display: flex;
+  justify-content: space-between;
+}
+
+.inline-item {
+  flex: 1;
+  margin-right: 10px;
+}
+
+.inline-item:last-child {
+  margin-right: 0;
+}
+
 button {
   background-color: #4CAF50;
   color: white;
