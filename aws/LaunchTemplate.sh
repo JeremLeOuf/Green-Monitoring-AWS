@@ -1,21 +1,10 @@
 #!/bin/bash
 
-# Switch to root user
-sudo su
-
-# Update and upgrade the system
-apt update && apt -y upgrade
+# Update the system
+sudo apt update -y
 
 # Install stress-ng and iperf
-apt -y install stress-ng iperf
-
-# Reboot the system
-sudo reboot
-
-# After reboot, continue with script execution
-sleep 60  # Wait for 1 minute after reboot (adjust as needed)
-
-# Script continues after reboot
+sudo apt -y install stress-ng iperf
 
 ######## LAMP INSTALLATION ########
 
@@ -23,8 +12,8 @@ sleep 60  # Wait for 1 minute after reboot (adjust as needed)
 
 ###################################
 
-# Install stress-ng, iperf, Apache, MySQL, PHP, and other packages
-sudo apt -y install stress-ng iperf apache2 mysql-server php libapache2-mod-php
+# Install Apache, MySQL, PHP, and other packages
+sudo apt -y install apache2 mysql-server php libapache2-mod-php
 
 # Secure MySQL server installation with pre-configured passwords
 sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password password bGGik5cq4mmuTKti69^'
@@ -63,7 +52,10 @@ EOF
 sudo chmod +x /home/ubuntu/hardware_stress.sh
 
 # Start iperf network load test to server for 1 hour
-timeout 3600 nohup iperf -c 16.171.200.246 &
+nohup iperf -c 16.171.200.246 &
+
+# Start the hardware stress test script
+nohup /home/ubuntu/hardware_stress.sh &
 
 # Inform about starting scripts
 echo "Starting hardware and network load tests..."

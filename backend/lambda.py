@@ -32,7 +32,8 @@ def get_carbon_intensity(region):
     api_url = f"https://api.electricitymap.org/v3/carbon-intensity/latest?zone={
         region_mapping.get(region)}"
     headers = {
-        'auth-token': 'mH1ux820u6aJMbHz3svz1AD3'  # TO BE SECURED
+        # TO BE SECURED IN CREDENTIALS MANAGER
+        'auth-token': 'mH1ux820u6aJMbHz3svz1AD3'
     }
 
     try:

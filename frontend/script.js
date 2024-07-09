@@ -105,7 +105,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 let carbonIntensityTableHtml = `<table class="table carbon-intensity-table">`;
                 carbonIntensityTableHtml += `<tr><th>Region Details:</th><th>Value:</th></tr>`;
                 for (const row of parsedData.table_data.carbon_intensity) {
-                    carbonIntensityTableHtml += `<tr><td>${row.Metric}</td><td>${row.Value}</td></tr>`;
+                    carbonIntensityTableHtml += `<tr><td>${row.Metric}</td><td>${row.Value}</td></tr>`; 
+                    // TODO: calculate CO2e in lambda
                 }
                 carbonIntensityTableHtml += `</table>`;
 
