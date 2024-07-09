@@ -53,25 +53,26 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Check if parsedData contains messages and table_data
             if (parsedData.messages && parsedData.table_data) {
-                // Construct formatted messages
-                let formattedMessages = parsedData.messages.map(message => {
-                    // Format instance type as markdown
-                    message = message.replace(instanceType, `\`${instanceType}\``);
+                    // Construct formatted messages
+                    let formattedMessages = parsedData.messages.map(message => {
 
-                    // Bold specific value for Kilowatt-Hours (kWh)
-                    message = message.replace(/(\d+\.\d+) Kilowatt-Hours:/g, '<b>$1 Kilowatt-Hours:</b>');
+                    // Format instance type as bold
+                    message = message.replace(instanceType, `<b>${instanceType}</b>`);
 
                     // Bold numerical values followed by % for CPU utilization, including "CPU Utilization"
                     message = message.replace(/(\d+(\.\d+)?)% (CPU Utilization)/g, '<b>$1%</b> <b>$3</b>');
 
-                    // Bold numbers followed by " Watt" for Watts
-                    message = message.replace(/(\d+\.\d+) Watts/g, '<b>$1 Watts</b>');
+                    // Bold the number of hours/days/weeks/months dynamically
+                    message = message.replace(/(\d+\s(hours?|days?|weeks?|months?|years?))/g, '<b>$1</b>');
+
+                    // Bold numbers followed by " Watts" and the "(W)"
+                    message = message.replace(/(\d+\.\d+) Watts\s?\(W\)/g, '<b>$1 Watts</b> <b>(W)</b>');
+                    
+                    // Bold specific value for Kilowatt-Hours (kWh)
+                    message = message.replace(/(\d+\.\d+) Kilowatt-Hours:/g, '<b>$1 Kilowatt-Hours:</b>');
 
                     // Bold numbers followed by " gCO2/kWh" for Carbon Intensity and round the number
                     message = message.replace(/(\d+\.\d+) gCO2\/kWh/g, (_, value) => `<b>${Math.round(value)} gCO2/kWh</b>`);
-
-                    // Extract the number of hours from the message dynamically
-                    message = message.replace(/(\d+) hours/g, '<b>$1 hours</b>');
 
                     // Include the region name with bold formatting
                     message = message.replace(/The carbon intensity for your region is/, `The carbon intensity for your region <b>(${region})</b> is`);
@@ -81,7 +82,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // Build the first table for instance details data
                 let minMaxTableHtml = `<table class="table instance-table">`;
-                minMaxTableHtml += `<tr><th>\`${instanceType}\` details:</th><th>Value:</th></tr>`;
+                minMaxTableHtml += `<tr><th>${instanceType} details:</th><th>Value:</th></tr>`;
                 for (const row of parsedData.table_data.min_max) {
                     minMaxTableHtml += `<tr><td>${row.Metric}</td><td>${row.Value}</td></tr>`;
                 }

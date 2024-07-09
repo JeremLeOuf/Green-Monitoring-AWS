@@ -10,13 +10,30 @@ body {
 }
 
 .container {
+  display: flex;
   background: #fff;
   padding: 20px 40px;
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  max-width: 500px;
-  width: 100%;
-  text-align: center;
+  width: 90%;
+  max-width: 1200px;
+}
+
+.form-container {
+  flex: 1;
+  max-width: 400px;
+  margin-right: 20px;
+}
+
+.results-container {
+  flex: 2;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+  overflow-y: auto;
+  max-height: 80vh;
+  word-wrap: break-word;
 }
 
 h1 {
@@ -71,10 +88,6 @@ button {
 
 button:hover {
   background-color: #45a049;
-}
-
-#results {
-  margin-top: 20px;
 }
 
 .table {
