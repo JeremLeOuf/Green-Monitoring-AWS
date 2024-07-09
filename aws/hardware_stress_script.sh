@@ -84,8 +84,8 @@ chmod +x /home/ubuntu/hardware_stress.sh
 
 echo "Starting the network load script..."
 
-# Starts an iperf client in the background to my webserver server for 20mins
-nohup iperf -c 16.171.200.246 &
+# Starts an iperf client in the background to my webserver server for 1hr
+timeout 3600 nohup iperf -c 16.171.200.246 &
 
 echo "Starting the hardware load script..."
 
