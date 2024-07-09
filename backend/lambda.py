@@ -101,12 +101,13 @@ def lambda_handler(event, context):
 
         # Create separate dictionaries for each table's data
         min_max_data = [
-            {'Metric': 'Min. Watts:', 'Value': f'{min_watts:.2f} W'},
-            {'Metric': 'Max Watts:', 'Value': f'{max_watts:.2f} W'}
+            {'Metric': 'Min. Watts (@ Idle):', 'Value': f'{min_watts:.2f} W'},
+            {'Metric': 'Max Watts (@ 100% Util.):',
+             'Value': f'{max_watts:.2f} W'}
         ]
         avg_watt_hours_data = [
-            {'Metric': 'Average power consumption:', 'Value': f'{avg_watts:.2f} W'},
-            {'Metric': f'Power consumption on {
+            {'Metric': 'Average Power Consumption:', 'Value': f'{avg_watts:.2f} W'},
+            {'Metric': f'Power Consumption on {
                 period_label}:', 'Value': f'{kWh:.2f} kWh'}
         ]
         carbon_intensity_data = [
