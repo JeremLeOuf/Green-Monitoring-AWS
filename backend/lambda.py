@@ -32,7 +32,7 @@ def get_carbon_intensity(region):
     api_url = f"https://api.electricitymap.org/v3/carbon-intensity/latest?zone={
         region_mapping.get(region)}"
     headers = {
-        'auth-token': 'mH1ux820u6aJMbHz3svz1AD3'
+        'auth-token': 'mH1ux820u6aJMbHz3svz1AD3'  # TO BE SECURED
     }
 
     try:
@@ -116,7 +116,7 @@ def lambda_handler(event, context):
 
         # Create the messages for the response
         messages = [
-            f"Your {instance_type} instance with an average {vcpu_utilization:.0f}% CPU Utilization over a period of {period_label} would generate an average of {
+            f"Your {instance_type} instance, with an average {vcpu_utilization:.0f}% CPU Utilization over a period of {period_label}, would generate an average of {
                 avg_watts:.2f} Watts (W), consuming a total of <b>{kWh:.2f} Kilowatt-Hours (kWh)</b> over that period.<br><br>The carbon intensity for your region is {carbon_intensity:.2f} gCO2/kWh (as of **TODO**)."
         ]
 

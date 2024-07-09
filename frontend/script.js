@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // Build the first table for instance details data
                 let minMaxTableHtml = `<table class="table instance-table">`;
-                minMaxTableHtml += `<tr><th>${instanceType} details:</th><th>Value:</th></tr>`;
+                minMaxTableHtml += `<tr><th>${instanceType} Details:</th><th>Value:</th></tr>`;
                 for (const row of parsedData.table_data.min_max) {
                     minMaxTableHtml += `<tr><td>${row.Metric}</td><td>${row.Value}</td></tr>`;
                 }
@@ -90,10 +90,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // Build the second table for the utilization data
                 let avgWattHoursTableHtml = `<table class="table utilization-table">`;
-                avgWattHoursTableHtml += `<tr><th>Utilization details:</th><th>Value:</th></tr>`;
+                avgWattHoursTableHtml += `<tr><th>Utilization Details:</th><th>Value:</th></tr>`;
                 for (const row of parsedData.table_data.avg_watt_hours) {
                     // Bold the specific value for Kilowatt-Hours (kWh) in the table
-                    if (row.Metric.includes('Instance power consumption (kWh)')) {
+                    if (row.Metric.includes('Instance Power Consumption (kWh)')) {
                         avgWattHoursTableHtml += `<tr><td>${row.Metric}</td><td><b>${row.Value}</b></td></tr>`;
                     } else {
                         avgWattHoursTableHtml += `<tr><td>${row.Metric}</td><td>${row.Value}</td></tr>`;
@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // Build the third table for the carbon intensity data
                 let carbonIntensityTableHtml = `<table class="table carbon-intensity-table">`;
-                carbonIntensityTableHtml += `<tr><th>Region details:</th><th>Value:</th></tr>`;
+                carbonIntensityTableHtml += `<tr><th>Region Details:</th><th>Value:</th></tr>`;
                 for (const row of parsedData.table_data.carbon_intensity) {
                     carbonIntensityTableHtml += `<tr><td>${row.Metric}</td><td>${row.Value}</td></tr>`;
                 }
