@@ -53,9 +53,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Check if parsedData contains messages and table_data
             if (parsedData.messages && parsedData.table_data) {
-                    // Construct formatted messages
-                    let formattedMessages = parsedData.messages.map(message => {
-
+                // Construct formatted messages
+                let formattedMessages = parsedData.messages.map(message => {
                     // Format instance type as bold
                     message = message.replace(instanceType, `<b>${instanceType}</b>`);
 
@@ -67,7 +66,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     // Bold numbers followed by " Watts" and the "(W)"
                     message = message.replace(/(\d+\.\d+) Watts\s?\(W\)/g, '<b>$1 Watts</b> <b>(W)</b>');
-                    
+
                     // Bold specific value for Kilowatt-Hours (kWh)
                     message = message.replace(/(\d+\.\d+) Kilowatt-Hours:/g, '<b>$1 Kilowatt-Hours:</b>');
 
@@ -82,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // Build the first table for instance details data
                 let minMaxTableHtml = `<table class="table instance-table">`;
-                minMaxTableHtml += `<tr><th>${instanceType} Details:</th><th>Value:</th></tr>`;
+                minMaxTableHtml += `<tr><th>${instanceType} details:</th><th>Value:</th></tr>`;
                 for (const row of parsedData.table_data.min_max) {
                     minMaxTableHtml += `<tr><td>${row.Metric}</td><td>${row.Value}</td></tr>`;
                 }
@@ -90,10 +89,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // Build the second table for the utilization data
                 let avgWattHoursTableHtml = `<table class="table utilization-table">`;
-                avgWattHoursTableHtml += `<tr><th>Utilization Details:</th><th>Value:</th></tr>`;
+                avgWattHoursTableHtml += `<tr><th>Utilization details:</th><th>Value:</th></tr>`;
                 for (const row of parsedData.table_data.avg_watt_hours) {
                     // Bold the specific value for Kilowatt-Hours (kWh) in the table
-                    if (row.Metric.includes('Instance Power Consumption (kWh)')) {
+                    if (row.Metric.includes('Instance power consumption (kWh)')) {
                         avgWattHoursTableHtml += `<tr><td>${row.Metric}</td><td><b>${row.Value}</b></td></tr>`;
                     } else {
                         avgWattHoursTableHtml += `<tr><td>${row.Metric}</td><td>${row.Value}</td></tr>`;
@@ -103,12 +102,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // Build the third table for the carbon intensity data
                 let carbonIntensityTableHtml = `<table class="table carbon-intensity-table">`;
-                carbonIntensityTableHtml += `<tr><th>Region Details:</th><th>Value:</th></tr>`;
+                carbonIntensityTableHtml += `<tr><th>Region details:</th><th>Value:</th></tr>`;
                 for (const row of parsedData.table_data.carbon_intensity) {
-                    carbonIntensityTableHtml += `<tr><td>${row.Metric}</td><td>${row.Value}</td></tr>`; 
-                    // TODO: calculate CO2e in lambda
+                    carbonIntensityTableHtml += `<tr><td>${row.Metric}</td><td>${row.Value}</td></tr>`;
                 }
                 carbonIntensityTableHtml += `</table>`;
+
+                // Build the fourth table for the estimated CO2e emissions data
+                let co2eEmissionsTableHtml = `<table class="table co2e-emissions-table">`;
+                co2eEmissionsTableHtml += `<tr><th>Final Result:</th><th>Value:</th></tr>`;
+                for (const row of parsedData.table_data.co2e_emissions) {
+                    co2eEmissionsTableHtml += `<tr><td>${row.Metric}</td><td>${row.Value}</td></tr>`;
+                }
+                co2eEmissionsTableHtml += `</table>`;
 
                 // Return the combined HTML for messages and all tables
                 return `
@@ -116,6 +122,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     ${minMaxTableHtml}
                     ${avgWattHoursTableHtml}
                     ${carbonIntensityTableHtml}
+                    ${co2eEmissionsTableHtml}
                 `;
             } else {
                 return '<p>No data available.</p>';
