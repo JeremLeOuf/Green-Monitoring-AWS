@@ -1,12 +1,25 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
     const form = document.getElementById('metrics-form');
     const resultsDiv = document.getElementById('results');
+    const instanceTypeSelect = document.getElementById('instance_type');
+
+    // Fetch instance types and categories from Lambda function
+    try {
+        const response = await fetch('https://gqupth3jnl.execute-api.eu-north-1.amazonaws.com/test');
+        const data = await response.json();
+
+        if (data.instance_categories) {
+            populateInstanceTypes(data.instance_categories);
+        }
+    } catch (error) {
+        console.error('Error fetching instance types:', error);
+    }
 
     form.addEventListener('submit', async function(event) {
         event.preventDefault(); // Prevent default form submission
 
         // Fetch form values
-        const instanceType = document.getElementById('instance_type').value;
+        const instanceType = instanceTypeSelect.value;
         const period = document.getElementById('period').value;
         const vcpuUtilization = document.getElementById('vcpu_utilization').value;
         const region = document.getElementById('region').value;
@@ -44,6 +57,22 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    function populateInstanceTypes(instanceCategories) {
+        for (const category in instanceCategories) {
+            const optgroup = document.createElement('optgroup');
+            optgroup.label = category;
+
+            instanceCategories[category].forEach(instanceType => {
+                const option = document.createElement('option');
+                option.value = instanceType;
+                option.text = instanceType;
+                optgroup.appendChild(option);
+            });
+
+            instanceTypeSelect.appendChild(optgroup);
+        }
+    }
+
     function formatResults(data, instanceType, period, region) {
         console.log('Response data:', data); // Log the response for debugging
 
@@ -65,8 +94,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     message = message.replace(/(\d+\s(hours?|days?|weeks?|months?|years?))/g, '<b>$1</b>');
 
                     // Bold numbers followed by " Watts" and the "(W)"
-                    message = message.replace(/(\d+\.\d+) Watts\s?\(W\)/g, '<b>$1 Watts</b> <b>(W)</b>');
-
+                    message = message.replace(/(\d+\.\d+) Watts \((W)\)/g, '<b>$1 Watts</b> (<b>$2</b>)');
+                    
                     // Bold specific value for Kilowatt-Hours (kWh)
                     message = message.replace(/(\d+\.\d+) Kilowatt-Hours:/g, '<b>$1 Kilowatt-Hours:</b>');
 
@@ -108,7 +137,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 carbonIntensityTableHtml += `</table>`;
 
-                // Build the fourth table for the estimated CO2e emissions data
+                // Build the final table for CO2e emissions
                 let co2eEmissionsTableHtml = `<table class="table co2e-emissions-table">`;
                 co2eEmissionsTableHtml += `<tr><th>Final Result:</th><th>Value:</th></tr>`;
                 for (const row of parsedData.table_data.co2e_emissions) {

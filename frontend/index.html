@@ -8,80 +8,79 @@
 </head>
 <body>
     <div class="container">
-        <div class="form-container">
-            <h1>EC2 Instance CO2e Calculator</h1>
-            <form id="metrics-form">
-                <div class="form-group">
-                    <label for="instance_type">Instance Type:</label>
-                    <input type="text" id="instance_type" name="instance_type" required>
-                </div>
-                <div class="form-group">
-                    <label for="period">Period of Utilization:</label>
-                    <select id="period" name="period">
-                        <option value="3600">1 Hour</option>
-                        <option value="43200">12 Hours</option>
-                        <option value="86400">1 Day</option>
-                        <option value="604800">1 Week</option>
-                        <option value="2592000">1 Month</option>
-                        <option value="31536000">1 Year</option>
+        <h1>EC2 Instance CO2e Calculator</h1>
+        <form id="metrics-form">
+            <div class="form-group">
+                <label for="instance_type">Instance Type:</label>
+                <select id="instance_type" name="instance_type" required></select>
+            </div>
+            <div class="form-group">
+                <label for="period">Period of utilization:</label>
+                <select id="period" name="period">
+                    <option value="3600">1 Hour</option>
+                    <option value="43200">12 Hours</option>
+                    <option value="86400">1 Day</option>
+                    <option value="604800">1 Week</option>
+                    <option value="2592000">1 Month</option>
+                    <option value="31536000">1 Year</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="vcpu_utilization">Average CPU Utilization (%):</label>
+                <input type="number" id="vcpu_utilization" name="vcpu_utilization" value="10" min="0" max="100">
+            </div>
+            <div class="form-group">
+                <label for="region">Region:</label>
+                <select id="region" name="region" required>
+                    <optgroup label="North America">
+                        <option value="us-east-1">US East (N. Virginia) - us-east-1</option>
+                        <option value="us-east-2">US East (Ohio) - us-east-2</option>
+                        <option value="us-west-1">US West (N. California) - us-west-1</option>
+                        <option value="us-west-2">US West (Oregon) - us-west-2</option>
+                        <option value="ca-central-1">Canada (Central) - ca-central-1</option>
+                    </optgroup>
+                    <optgroup label="South America">
+                        <option value="sa-east-1">South America (São Paulo) - sa-east-1</option>
+                    </optgroup>
+                    <optgroup label="Europe">
+                        <option value="eu-central-1">Europe (Frankfurt) - eu-central-1</option>
+                        <option value="eu-north-1">Europe (Stockholm) - eu-north-1</option>
+                        <option value="eu-south-2">Europe (Spain) - eu-south-2</option>
+                        <option value="eu-west-1">Europe (Ireland) - eu-west-1</option>
+                        <option value="eu-west-2">Europe (London) - eu-west-2</option>
+                        <option value="eu-west-3">Europe (Paris) - eu-west-3</option>
+                    </optgroup>
+                    <optgroup label="Asia Pacific">
+                        <option value="ap-south-1">Asia Pacific (Mumbai) - ap-south-1</option>
+                        <option value="ap-southeast-1">Asia Pacific (Singapore) - ap-southeast-1</option>
+                        <option value="ap-southeast-2">Asia Pacific (Sydney) - ap-southeast-2</option>
+                        <option value="ap-southeast-3">Asia Pacific (Osaka) - ap-southeast-3</option>
+                        <option value="ap-southeast-4">Asia Pacific (Manila) - ap-southeast-4</option>
+                        <option value="ap-northeast-1">Asia Pacific (Tokyo) - ap-northeast-1</option>
+                        <option value="ap-northeast-2">Asia Pacific (Seoul) - ap-northeast-2</option>
+                        <option value="ap-northeast-3">Asia Pacific (Osaka) - ap-northeast-3</option>
+                    </optgroup>
+                </select>
+            </div>
+            <div class="form-group inline-group">
+                <div class="inline-item">
+                    <label for="storage_type">Storage Type:</label>
+                    <select id="storage_type" name="storage_type">
+                        <option value="HDD">HDD</option>
+                        <option value="SSD">SSD</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label for="vcpu_utilization">Average CPU Utilization (%):</label>
-                    <input type="number" id="vcpu_utilization" name="vcpu_utilization" value="10" min="0" max="100">
+                <div class="inline-item">
+                    <label for="allocated_volume">Allocated Volume (in GB):</label>
+                    <input type="number" id="allocated_volume" name="allocated_volume" value="8" min="1">
                 </div>
-                <div class="form-group">
-                    <label for="region">Region:</label>
-                    <select id="region" name="region" required>
-                        <optgroup label="North America">
-                            <option value="us-east-1">US East (N. Virginia) - us-east-1</option>
-                            <option value="us-east-2">US East (Ohio) - us-east-2</option>
-                            <option value="us-west-1">US West (N. California) - us-west-1</option>
-                            <option value="us-west-2">US West (Oregon) - us-west-2</option>
-                            <option value="ca-central-1">Canada (Central) - ca-central-1</option>
-                        </optgroup>
-                        <optgroup label="South America">
-                            <option value="sa-east-1">South America (São Paulo) - sa-east-1</option>
-                        </optgroup>
-                        <optgroup label="Europe">
-                            <option value="eu-central-1">Europe (Frankfurt) - eu-central-1</option>
-                            <option value="eu-north-1">Europe (Stockholm) - eu-north-1</option>
-                            <option value="eu-south-2">Europe (Spain) - eu-south-2</option>
-                            <option value="eu-west-1">Europe (Ireland) - eu-west-1</option>
-                            <option value="eu-west-2">Europe (London) - eu-west-2</option>
-                            <option value="eu-west-3">Europe (Paris) - eu-west-3</option>
-                        </optgroup>
-                        <optgroup label="Asia Pacific">
-                            <option value="ap-south-1">Asia Pacific (Mumbai) - ap-south-1</option>
-                            <option value="ap-southeast-1">Asia Pacific (Singapore) - ap-southeast-1</option>
-                            <option value="ap-southeast-2">Asia Pacific (Sydney) - ap-southeast-2</option>
-                            <option value="ap-southeast-3">Asia Pacific (Osaka) - ap-southeast-3</option>
-                            <option value="ap-southeast-4">Asia Pacific (Manila) - ap-southeast-4</option>
-                            <option value="ap-northeast-1">Asia Pacific (Tokyo) - ap-northeast-1</option>
-                            <option value="ap-northeast-2">Asia Pacific (Seoul) - ap-northeast-2</option>
-                            <option value="ap-northeast-3">Asia Pacific (Osaka) - ap-northeast-3</option>
-                        </optgroup>
-                    </select>
-                </div>
-                <div class="form-group inline-group">
-                    <div class="inline-item">
-                        <label for="storage_type">Storage Type:</label>
-                        <select id="storage_type" name="storage_type">
-                            <option value="HDD">HDD</option>
-                            <option value="SSD">SSD</option>
-                        </select>
-                    </div>
-                    <div class="inline-item">
-                        <label for="allocated_volume">Allocated Volume (in GB):</label>
-                        <input type="number" id="allocated_volume" name="allocated_volume" value="8" min="1">
-                    </div>
-                </div>
-                <button type="submit">Submit</button>
-            </form>
-        </div>
-        <div id="results" class="results-container"></div> 
-        <!-- TODO: Restyle-->
+            </div>
+            <button type="submit">Submit</button>
+        </form>
+        <div id="results"></div>
     </div>
+
+    <!-- Include AWS SDK v2 -->
     <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1043.0.min.js"></script>
     <script src="script.js"></script>
 </body>
