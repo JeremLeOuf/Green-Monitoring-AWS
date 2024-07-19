@@ -1,3 +1,4 @@
+import os
 import boto3
 import json
 import pandas as pd
@@ -32,7 +33,7 @@ region_mapping = {
 def get_carbon_intensity(region):
     api_url = f"https://api.electricitymap.org/v3/carbon-intensity/latest?zone={region_mapping.get(region)}"
     headers = {
-        'auth-token': 'mH1ux820u6aJMbHz3svz1AD3'
+        'auth-token': os.environ['ELECTRICITYMAP_API_KEY']
     }
 
     try:
