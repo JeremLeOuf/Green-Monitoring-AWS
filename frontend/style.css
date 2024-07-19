@@ -106,22 +106,27 @@ button:hover {
   background-color: #f2f2f2;
 }
 
-.instance-table, .utilization-table {
+.table th, .table td {
+  width: 50%; /* Ensuring all columns take up equal width */
+}
+
+.instance-table, .utilization-table, .carbon-intensity-table, .co2e-emissions-table {
   table-layout: fixed;
   width: 100%; /* Ensure tables take full width */
 }
 
-.instance-table td, .utilization-table td {
+.instance-table td, .utilization-table td, .carbon-intensity-table td, .co2e-emissions-table td {
   word-break: normal; /* Prevent word break */
 }
 
-.instance-table td:nth-child(1), .utilization-table td:nth-child(1) {
+.instance-table th:nth-child(1), .utilization-table th:nth-child(1), .carbon-intensity-table th:nth-child(1), .co2e-emissions-table th:nth-child(1) {
   width: 70%; /* Adjusted to ensure long text fits */
 }
 
-.instance-table td:nth-child(2), .utilization-table td:nth-child(2) {
+.instance-table th:nth-child(2), .utilization-table th:nth-child(2), .carbon-intensity-table th:nth-child(2), .co2e-emissions-table th:nth-child(2) {
   width: 30%; /* Adjusted proportionally */
   white-space: nowrap; /* Prevent text from wrapping */
   overflow: hidden; /* Hide overflow content */
   text-overflow: ellipsis; /* Display ellipsis for overflow text */
 }
+

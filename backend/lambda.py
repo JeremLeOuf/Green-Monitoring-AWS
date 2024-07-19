@@ -3,6 +3,7 @@ import json
 import pandas as pd
 import requests
 
+
 # Define region mapping for electricitymap.org API
 region_mapping = {
     'us-east-1': 'US-MIDA-PJM',
@@ -56,6 +57,9 @@ def lambda_handler(event, context):
         vcpu_utilization = float(
             event.get('vcpu_utilization', 10))  # Default: 10%
         region = event['region']
+        storage_type = event['storage_type']
+        allocated_volume = float(
+            event.get('allocated_volume', 8))  # Default: 8 GB
 
         # Load CSV data
         instance_data = pd.read_csv(
@@ -77,14 +81,27 @@ def lambda_handler(event, context):
         hours_in_period = period / 3600.0
         kWh = avg_watts * hours_in_period / 1000.0  # Convert from Wh to kWh
 
+        # Calculate storage power consumption
+        if storage_type == 'HDD':
+            storage_watts_per_tb = 0.65
+        elif storage_type == 'SSD':
+            storage_watts_per_tb = 1.2
+        else:
+            raise Exception(f"Unknown storage type '{storage_type}'")
+
+        # Convert GB to TB and calculate storage kWh
+        allocated_tb = allocated_volume / 1024.0
+        storage_watts = storage_watts_per_tb * allocated_tb
+        storage_kWh = storage_watts * hours_in_period / 1000.0  # Convert from Wh to kWh
+
         # Get carbon intensity for the region
         carbon_intensity = get_carbon_intensity(region)
 
-        # Define PUE for AWS:
+        # Define Power Usage Effectiveness (PUE) for AWS
         PUE = 1.135
 
-        # Calculate estimated CO2 emissions
-        estimated_co2e = kWh * carbon_intensity * PUE
+        # Calculate estimated CO2 emissions using the provided formula
+        estimated_co2e = (kWh + storage_kWh) * PUE * carbon_intensity
 
         # Determine the appropriate period label based on the input period
         if period >= 31536000:  # 1 year in seconds
@@ -114,18 +131,26 @@ def lambda_handler(event, context):
             {'Metric': f'Power consumption (kWh) for {period_label}:',
              'Value': f'{kWh:.2f} kWh'}
         ]
+        storage_data = [
+            {'Metric': 'Storage Type:', 'Value': f'{storage_type}'},
+            {'Metric': 'Allocated Volume (GB):',
+             'Value': f'{allocated_volume:.2f} GB'},
+            {'Metric': 'Storage Power Consumption (kWh):',
+             'Value': f'{storage_kWh:.2f} kWh'}
+        ]
         carbon_intensity_data = [
             {'Metric': 'Carbon Intensity (gCO2e/kWh):',
              'Value': f'{carbon_intensity:.0f} gCO2e/kWh'}
         ]
         co2e_emissions_data = [
             {'Metric': 'Estimated CO2e Emissions:',
-             'Value': f'<b>{estimated_co2e:,.0f} gCO2e</b>'.replace(",", ".")}
+                'Value': f'{estimated_co2e:,.0f} gCO2e'.replace(",", ".")}
         ]
 
         # Create the messages for the response
         messages = [
-            f"Your {instance_type} instance with an average {vcpu_utilization:.0f}% CPU Utilization over a period of {period_label} would generate an average of {avg_watts:.2f} Watts (W), consuming a total of <b>{kWh:.2f} Kilowatt-Hours (kWh)</b> over that period.<br><br>The carbon intensity for your region is {carbon_intensity:.2f} gCO2/kWh as of today."]
+            f"Your {instance_type} instance with an average {vcpu_utilization:.0f}% CPU Utilization over a period of {period_label} would generate an average of {avg_watts:.2f} Watts (W), consuming a total of <b>{kWh:.2f} Kilowatt-Hours (kWh)</b> over that period.<br><br>The carbon intensity for your region is {carbon_intensity:.2f} gCO2/kWh (as of today).<br><br>Your storage (<b>{storage_type} with {allocated_volume:.0f} GB</b>) would consume an additional <b>{storage_kWh:.2f} Kilowatt-Hours (kWh)</b> over the same period."
+        ]
 
         # Combine results into a dictionary
         results = {
@@ -135,6 +160,7 @@ def lambda_handler(event, context):
                 'table_data': {
                     'min_max': min_max_data,
                     'avg_watt_hours': avg_watt_hours_data,
+                    'storage': storage_data,
                     'carbon_intensity': carbon_intensity_data,
                     'co2e_emissions': co2e_emissions_data
                 }
