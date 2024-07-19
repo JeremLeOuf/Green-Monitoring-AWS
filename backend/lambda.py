@@ -145,7 +145,7 @@ def lambda_handler(event, context):
         ]
         co2e_emissions_data = [
             {'Metric': 'Estimated CO2e Emissions:',
-                'Value': f'{estimated_co2e:,.0f} gCO2e'.replace(",", ".")}
+                'Value': f'{estimated_co2e:,.0f} gCO2e'}
         ]
 
         # Create the messages for the response
