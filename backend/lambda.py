@@ -31,7 +31,7 @@ region_mapping = {
 def get_carbon_intensity(region):
     api_url = f"https://api.electricitymap.org/v3/carbon-intensity/latest?zone={region_mapping.get(region)}"
     headers = {
-        'auth-token': 'mH1ux820u6aJMbHz3svz1AD3'  # to be hidden
+        'auth-token': 'mH1ux820u6aJMbHz3svz1AD3'
     }
 
     try:
@@ -48,30 +48,18 @@ def lambda_handler(event, context):
 
     try:
         # Extract data from the event payload with default values
-        instance_type = event.get('instance_type')
+        instance_type = event['instance_type']
         period_label = event.get(
             'period_label', '24 hours')  # Default: '24 hours'
         # Default: 86400 seconds (24 hours)
         period = float(event.get('period', 86400))
         vcpu_utilization = float(
             event.get('vcpu_utilization', 10))  # Default: 10%
-        region = event.get('region')
+        region = event['region']
 
         # Load CSV data
         instance_data = pd.read_csv(
             'https://raw.githubusercontent.com/cloud-carbon-footprint/cloud-carbon-coefficients/main/data/aws-instances.csv')
-
-        # Extract instance types and categories
-        instance_categories = instance_data.groupby(
-            'Family')['Instance type'].apply(list).to_dict()
-
-        if not instance_type:
-            return {
-                'statusCode': 200,
-                'body': json.dumps({
-                    'instance_categories': instance_categories
-                })
-            }
 
         # Fetch power consumption data for the given instance type
         try:
@@ -92,11 +80,11 @@ def lambda_handler(event, context):
         # Get carbon intensity for the region
         carbon_intensity = get_carbon_intensity(region)
 
-        # Define Power Usage Effectiveness (PUE) for AWS
+        # Define PUE for AWS:
         PUE = 1.135
 
-        # Calculate estimated CO2 emissions using the provided formula
-        estimated_co2e = kWh * PUE * carbon_intensity
+        # Calculate estimated CO2 emissions
+        estimated_co2e = kWh * carbon_intensity * PUE
 
         # Determine the appropriate period label based on the input period
         if period >= 31536000:  # 1 year in seconds
@@ -132,12 +120,12 @@ def lambda_handler(event, context):
         ]
         co2e_emissions_data = [
             {'Metric': 'Estimated CO2e Emissions:',
-                'Value': f'<b>{estimated_co2e:,.0f} gCO2e</b>'.replace(",", ".")}
+             'Value': f'<b>{estimated_co2e:,.0f} gCO2e</b>'.replace(",", ".")}
         ]
 
         # Create the messages for the response
         messages = [
-            f"Your {instance_type} instance with an average {vcpu_utilization:.0f}% CPU Utilization over a period of {period_label} would generate an average of {avg_watts:.2f} Watts (W), consuming a total of <b>{kWh:.2f} Kilowatt-Hours (kWh)</b> over that period.<br><br>The carbon intensity for your region is {carbon_intensity:.2f} gCO2/kWh (as of today)."]
+            f"Your {instance_type} instance with an average {vcpu_utilization:.0f}% CPU Utilization over a period of {period_label} would generate an average of {avg_watts:.2f} Watts (W), consuming a total of <b>{kWh:.2f} Kilowatt-Hours (kWh)</b> over that period.<br><br>The carbon intensity for your region is {carbon_intensity:.2f} gCO2/kWh as of today."]
 
         # Combine results into a dictionary
         results = {
